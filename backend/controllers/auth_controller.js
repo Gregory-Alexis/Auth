@@ -1,6 +1,7 @@
 const User = require("../models/User_model");
 const bcrypt = require("bcrypt");
 const generateTokenAndSetCookie = require("../utils/generateTokenAndSetCookie");
+const sendVerificationEmail = require("../mailtrap/emails");
 
 const signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -27,6 +28,8 @@ const signup = async (req, res) => {
     await user.save();
 
     generateTokenAndSetCookie(res, user._id);
+
+    await sendVerificationEmail(user.email, verificationToken);
 
     res.status(201).json({
       success: true,
