@@ -22,14 +22,12 @@ export const useAuthStore = create((set) => ({
       });
       set({ user: response.data.user, isAuthenticated: true, isLoading: false, error: null });
     } catch (error) {
-      set({
-        error: error.response.data.message || 'Error signing up',
-        isLoading: false,
-        error: true,
-      });
+      const errorMessage = error.response?.data?.message || 'Error signing up';
+      set({ error: errorMessage, isLoading: false });
       throw error;
     }
   },
+
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
@@ -41,12 +39,9 @@ export const useAuthStore = create((set) => ({
         isLoading: false,
       });
     } catch (error) {
-      console.log('Error', error);
-      set({
-        error: error.response.data.message || 'Error logging in',
-        isLoading: false,
-      });
-      throw new Error(error.response.data.message);
+      const errorMessage = error.response?.data?.message || 'Error logging in';
+      set({ error: errorMessage, isLoading: false });
+      throw error;
     }
   },
 
@@ -56,7 +51,8 @@ export const useAuthStore = create((set) => ({
       await axios.post(`${API_URL}/logout`);
       set({ user: null, isAuthenticated: false, error: null, isLoading: false });
     } catch (error) {
-      set({ error: 'Error logging out', isLoading: false });
+      const errorMessage = 'Error logging out';
+      set({ error: errorMessage, isLoading: false });
       throw error;
     }
   },
@@ -65,13 +61,11 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(`${API_URL}/verify-email`, { code });
-      set({ isAuthenticated: true, user: response.data.user, isLoading: false, error: true });
+      set({ isAuthenticated: true, user: response.data.user, isLoading: false, error: null });
       return response.data;
     } catch (error) {
-      set({
-        error: error.response.data.message || 'Error verifying email',
-        isLoading: false,
-      });
+      const errorMessage = error.response?.data?.message || 'Error verifying email';
+      set({ error: errorMessage, isLoading: false });
       throw error;
     }
   },
