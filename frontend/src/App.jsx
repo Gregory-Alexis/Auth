@@ -1,38 +1,40 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
+import { useAuthStore } from './store/authStore';
+import { useEffect } from 'react';
 
 import Login from './pages/Login';
 import SingUp from './pages/SingUp';
 import EmailVerification from './pages/EmailVerification';
-import { useAuthStore } from './store/authStore';
-import { useEffect } from 'react';
 import HomePage from './pages/HomePage';
 
+// protect routes that require authentication
+const ProtectedRoute = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (!isAuthenticated) {
+    return <Navigate to='/login' replace />;
+  }
+
+  if (!user.isVerified) {
+    return <Navigate to='/verify-email' replace />;
+  }
+  return children;
+};
+
+// redirect to home page if user is authenticated
+const RedirectAuthenticatedUser = ({ children }) => {
+  const { isAuthenticated, user } = useAuthStore();
+
+  if (isAuthenticated && user.isVerified) {
+    return <Navigate to='/' replace />;
+  }
+
+  return children;
+};
+
 function App() {
-  const { isCheckingAuth, checkAuth, isAuthenticated, user } = useAuthStore();
-
-  // protect routes that require authentication
-  const ProtectedRoute = ({ children }) => {
-    const { isAuthenticated, user } = useAuthStore();
-
-    if (!isAuthenticated) {
-      return <Navigate to='/login' replace />;
-    }
-
-    if (!user.isVerified) {
-      return <Navigate to='/verify-email' replace />;
-    }
-    return children;
-  };
-
-  // redirect to home page if user is authenticated
-  const RedirectAuthenticatedUser = ({ children }) => {
-    if (isAuthenticated && user.isVerified) {
-      return <Navigate to='/' replace />;
-    }
-
-    return children;
-  };
+  const { isCheckingAuth, checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -49,6 +51,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path='/signup'
           element={
