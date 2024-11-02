@@ -7,6 +7,8 @@ import Login from './pages/Login';
 import SingUp from './pages/SingUp';
 import EmailVerification from './pages/EmailVerification';
 import HomePage from './pages/HomePage';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // protect routes that require authentication
 const ProtectedRoute = ({ children }) => {
@@ -69,6 +71,22 @@ function App() {
           }
         />
         <Route path='/verify-email' element={<EmailVerification />} />
+        <Route
+          path='/forgot-password'
+          element={
+            <RedirectAuthenticatedUser>
+              <ForgotPassword />
+            </RedirectAuthenticatedUser>
+          }
+        />
+        <Route
+          path='/reset-password/:token'
+          element={
+            <RedirectAuthenticatedUser>
+              <ResetPassword />
+            </RedirectAuthenticatedUser>
+          }
+        />
       </Routes>
       <Toaster />
     </div>
